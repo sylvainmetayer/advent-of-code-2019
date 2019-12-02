@@ -28,46 +28,28 @@ class Solver:
         self.items[res_index] = res
         return res
 
-    def handle_find_item(self, sublist: list, seek: int):
-        if type(sublist) != list:
-            raise SolverError("Need a list to process")
-        if len(sublist) == 1 and sublist[0] == 99:
-            return None
-        if len(sublist) != 4:
-            print(sublist)
-            raise SolverError("test")
-        operation, noun, verb, res_index = sublist
-
-        if not 0 <= noun <= 99 or not 0 <= verb <= 99:
-            self.items[res_index] = self.items[noun] + self.items[verb] \
-                if operation == 1 else self.items[noun] * self.items[verb]
-
-        print(f'operation {operation} : noun({noun}): {self.items[noun]} - '
-              f'verb({verb}): {self.items[verb]} - res({res_index}):{self.items[res_index]}')
-
-        return self.items[res_index]
-
-    def find_item(self, seek: int):
-        backup = self.items.copy()
+    def process(self, first_item=None, second_item=None):
         i = 0
-        sublist = self.get_sublist(4, i)
-        res = self.handle_find_item(sublist, seek)
-        while res != seek:
-            sublist = self.get_sublist(4, i)
-            i += len(sublist) if len(sublist) > 0 else 1
-            res = self.handle_find_item(sublist, seek)
-            if res is None:
-                self.items = backup
-            print(f'i = {i} : {sublist} => "{res}"')
-        if len(sublist) == 2:
-            return sublist[1], sublist[2]
-        return None
-
-    def process(self):
-        i = 0
+        self.items[1] = first_item if first_item is not None else self.items[1]
+        self.items[2] = second_item if second_item is not None else self.items[2]
         while self.handle_sublist(self.get_sublist(4, i)) is not None:
             i += 4
         return self.items[0]
+
+    def find(self, seek):
+        final_noun = final_verb = None
+        backup = self.items.copy()
+        for noun in range(100):
+            for verb in range(100):
+                self.items = backup.copy()
+                output = self.process(noun, verb)
+                if output == seek:
+                    final_noun = noun
+                    final_verb = verb
+                    break
+            if final_verb is not None and final_noun is not None:
+                break
+        return final_noun, final_verb
 
     def init(self, filename: str):
         with open(filename, "r") as file:
@@ -79,6 +61,7 @@ if __name__ == '__main__':
     s = Solver()
     f = os.path.dirname(os.path.realpath(__file__)) + "/../inputs/day2.txt"
     s.init(f)
-    print(f'Solve simple : {s.process()}')
+    print(f'Solve simple : {s.process(12, 2)}')
     s.init(f)
-    print(f'Solve find item : {s.find_item(19690720)}')
+    res_noun, res_verb = s.find(19690720)
+    print(f'Solve find item : {100 * res_noun + res_verb}')
