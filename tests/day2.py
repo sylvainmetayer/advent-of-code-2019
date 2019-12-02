@@ -23,11 +23,11 @@ class SolverTest(TestCase):
 
     def test_sublist_end(self):
         self.s.items = [1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50]
-        self.assertEqual([99, 30, 40, 50], self.s.get_sublist(4, 8))
+        self.assertEqual([99], self.s.get_sublist(4, 8))
 
     def test_sublist_more_than_end(self):
         self.s.items = [1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50]
-        self.assertEqual([99, 30, 40, 50], self.s.get_sublist(5, 8))
+        self.assertEqual([99], self.s.get_sublist(5, 8))
 
     def test_handle_sublist_without_4_items(self):
         with self.assertRaises(SolverError):

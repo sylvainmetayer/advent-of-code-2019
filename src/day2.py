@@ -13,7 +13,9 @@ class Solver:
         self.items = list()
 
     def get_sublist(self, number: int = 4, offset: int = 0) -> list:
-        return self.items[offset: offset + number]
+        sublist = self.items[offset: offset + number]
+        print(sublist, sublist[0])
+        return [sublist[0]] if sublist[0] == 99 and len(sublist) >= 1 else sublist
 
     def handle_sublist(self, sublist: list):
         if type(sublist) != list or len(sublist) != 4:
@@ -41,10 +43,10 @@ class Solver:
             self.items = list(map(lambda x: int(x), line.split(',')))
             i = 0
             sublist = self.get_sublist(4, i)
-            res = self.handle_find_item(sublist)
+            res = self.handle_find_item(sublist, seek)
             while res != seek:
-                i += 4 if res is not None else 1
                 sublist = self.get_sublist(4, i)
+                i += len(sublist)
                 res = self.handle_find_item(sublist, seek)
                 print(res)
         return sublist[1], sublist[2]
