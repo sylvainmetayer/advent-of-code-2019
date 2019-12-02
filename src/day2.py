@@ -25,19 +25,42 @@ class Solver:
         self.items[res_index] = res
         return res
 
-    def process(self, filename: str):
+    def handle_find_item(self, sublist: list, seek: int):
+        print(sublist)
+        if type(sublist) != list or len(sublist) != 4:
+            raise SolverError("Need 4 item in a list to process")
+        operation, noun, verb, res_index = sublist
+
+        if operation == 99:
+            return None
+        return self.items[noun] + self.items[verb] if operation == 1 else self.items[noun] * self.items[verb]
+
+    def find_item(self, filename: str, seek: int = 19690720):
         with open(filename, "r") as file:
-            i = 0
             line = file.read()
             self.items = list(map(lambda x: int(x), line.split(',')))
-            print(self.items)
+            i = 0
+            sublist = self.get_sublist(4, i)
+            res = self.handle_find_item(sublist)
+            while res != seek:
+                i += 4 if res is not None else 1
+                sublist = self.get_sublist(4, i)
+                res = self.handle_find_item(sublist, seek)
+                print(res)
+        return sublist[1], sublist[2]
+
+    def process(self, filename: str):
+        with open(filename, "r") as file:
+            line = file.read()
+            self.items = list(map(lambda x: int(x), line.split(',')))
             i = 0
             while self.handle_sublist(self.get_sublist(4, i)) is not None:
                 i += 4
-        return self.items
+        return self.items[0]
 
 
 if __name__ == '__main__':
     s = Solver()
     f = os.path.dirname(os.path.realpath(__file__)) + "/../inputs/day2.txt"
     print(f'Solve simple : {s.process(f)}')
+    print(f'Solve find item : {s.find_item(f, 19690720)}')
